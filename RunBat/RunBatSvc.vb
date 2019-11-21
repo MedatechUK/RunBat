@@ -69,12 +69,9 @@ Public Class RunBatSvc : Inherits myService
 
         Try
 
-            While New FileInfo(e.FullPath).Length = 0
-                Threading.Thread.Sleep(100)
-            End While
-
-            While DateAdd(DateInterval.Second, 5, New FileInfo(e.FullPath).LastWriteTime) < Now
-                Threading.Thread.Sleep(100)
+            Threading.Thread.Sleep(500)
+            While IsFileInUse(e.FullPath)
+                Threading.Thread.Sleep(500)
             End While
 
             Dim bat As String = ""
@@ -130,6 +127,16 @@ Public Class RunBatSvc : Inherits myService
 
     End Sub
 
+    Private Function IsFileInUse(sFile As String) As Boolean
+        Try
+            If Not New FileInfo(sFile).Exists Then Return False
+            Using f As New IO.FileStream(sFile, FileMode.Open, FileAccess.ReadWrite, FileShare.None)
+            End Using
+        Catch Ex As Exception
+            Return True
+        End Try
+        Return False
+    End Function
 
 #End Region
 
